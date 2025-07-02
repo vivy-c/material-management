@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Tree View -->
+        <record id="view_material_management_tree" model="ir.ui.view">
+            <field name="name">material.management.tree</field>
+            <field name="model">material.management</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="code"/>
+                    <field name="name"/>
+                    <field name="type"/>
+                    <field name="buy_price"/>
+                    <field name="supplier_id"/>
+                </tree>
+            </field>
+        </record>
+
+        <!-- Form View -->
+        <record id="view_material_management_form" model="ir.ui.view">
+            <field name="name">material.management.form</field>
+            <field name="model">material.management</field>
+            <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="code"/>
+                                <field name="name"/>
+                                <field name="type"/>
+                            </group>
+                            <group>
+                                <field name="buy_price"/>
+                                <field name="supplier_id"/>
+                                <field name="active"/>
+                            </group>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <!-- Action -->
+        <record id="action_material_management" model="ir.actions.act_window">
+            <field name="name">Materials</field>
+            <field name="res_model">material.management</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Create your first material!
+                </p>
+            </field>
+        </record>
+    </data>
+</odoo>

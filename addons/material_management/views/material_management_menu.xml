@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Main Menu -->
+        <menuitem id="menu_material_management_root"
+                  name="Material Management"
+                  sequence="10"/>
+        
+        <!-- Sub Menu -->
+        <menuitem id="menu_material_management"
+                  name="Materials"
+                  parent="menu_material_management_root"
+                  action="action_material_management"
+                  sequence="10"/>
+    </data>
+</odoo>
