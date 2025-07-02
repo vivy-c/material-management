@@ -11,10 +11,11 @@
         * Set buy prices with minimum validation
         * Link materials to suppliers
         * Filter materials by type
+        * REST API for material management
     """,
     'author': 'Your Company',
     'website': 'https://www.yourcompany.com',
-    'depends': ['base', 'contacts'],
+    'depends': ['base', 'contacts', 'web'],
     'data': [
         'security/ir.model.access.csv',
         'views/material_management_views.xml',
