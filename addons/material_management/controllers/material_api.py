@@ -8,6 +8,431 @@ _logger = logging.getLogger(__name__)
 
 class MaterialAPI(http.Controller):
     
+    @http.route('/api/docs', type='http', auth='public', methods=['GET'], csrf=False)
+    def swagger_docs(self, **kwargs):
+        """Swagger UI Documentation"""
+        swagger_html = """
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Material Management API Documentation</title>
+    <link rel="stylesheet" type="text/css" href="https://unpkg.com/swagger-ui-dist@3.25.0/swagger-ui.css" />
+    <style>
+        html {
+            box-sizing: border-box;
+            overflow: -moz-scrollbars-vertical;
+            overflow-y: scroll;
+        }
+        *, *:before, *:after {
+            box-sizing: inherit;
+        }
+        body {
+            margin:0;
+            background: #fafafa;
+        }
+    </style>
+</head>
+<body>
+    <div id="swagger-ui"></div>
+    <script src="https://unpkg.com/swagger-ui-dist@3.25.0/swagger-ui-bundle.js"></script>
+    <script src="https://unpkg.com/swagger-ui-dist@3.25.0/swagger-ui-standalone-preset.js"></script>
+    <script>
+        window.onload = function() {
+            const ui = SwaggerUIBundle({
+                url: '/api/openapi.json',
+                dom_id: '#swagger-ui',
+                deepLinking: true,
+                presets: [
+                    SwaggerUIBundle.presets.apis,
+                    SwaggerUIStandalonePreset
+                ],
+                plugins: [
+                    SwaggerUIBundle.plugins.DownloadUrl
+                ],
+                layout: "StandaloneLayout"
+            });
+        };
+    </script>
+</body>
+</html>
+        """
+        return request.make_response(
+            swagger_html,
+            headers={'Content-Type': 'text/html'}
+        )
+    
+    @http.route('/api/openapi.json', type='http', auth='public', methods=['GET'], csrf=False)
+    def openapi_spec(self, **kwargs):
+        """OpenAPI 3.0 Specification"""
+        base_url = request.httprequest.host_url.rstrip('/')
+        
+        openapi_spec = {
+            "openapi": "3.0.0",
+            "info": {
+                "title": "Material Management API",
+                "description": "REST API for managing materials in Odoo",
+                "version": "1.0.0",
+                "contact": {
+                    "name": "API Support",
+                    "email": "support@yourcompany.com"
+                }
+            },
+            "servers": [
+                {
+                    "url": base_url,
+                    "description": "Development server"
+                }
+            ],
+            "security": [
+                {
+                    "sessionAuth": []
+                }
+            ],
+            "paths": {
+                "/api/materials": {
+                    "get": {
+                        "summary": "Get all materials",
+                        "description": "Retrieve a list of materials with optional filtering",
+                        "parameters": [
+                            {
+                                "name": "type",
+                                "in": "query",
+                                "description": "Filter by material type",
+                                "required": False,
+                                "schema": {
+                                    "type": "string",
+                                    "enum": ["fabric", "jeans", "cotton"]
+                                }
+                            },
+                            {
+                                "name": "active",
+                                "in": "query",
+                                "description": "Filter by active status",
+                                "required": False,
+                                "schema": {
+                                    "type": "string",
+                                    "enum": ["true", "false", "all"],
+                                    "default": "true"
+                                }
+                            },
+                            {
+                                "name": "limit",
+                                "in": "query",
+                                "description": "Number of records to return",
+                                "required": False,
+                                "schema": {
+                                    "type": "integer",
+                                    "default": 100
+                                }
+                            },
+                            {
+                                "name": "offset",
+                                "in": "query",
+                                "description": "Number of records to skip",
+                                "required": False,
+                                "schema": {
+                                    "type": "integer",
+                                    "default": 0
+                                }
+                            }
+                        ],
+                        "responses": {
+                            "200": {
+                                "description": "Successful response",
+                                "content": {
+                                    "application/json": {
+                                        "schema": {
+                                            "$ref": "#/components/schemas/MaterialListResponse"
+                                        }
+                                    }
+                                }
+                            },
+                            "400": {
+                                "description": "Bad request",
+                                "content": {
+                                    "application/json": {
+                                        "schema": {
+                                            "$ref": "#/components/schemas/ErrorResponse"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "post": {
+                        "summary": "Create a new material",
+                        "description": "Create a new material record",
+                        "requestBody": {
+                            "required": True,
+                            "content": {
+                                "application/json": {
+                                    "schema": {
+                                        "$ref": "#/components/schemas/MaterialCreate"
+                                    }
+                                }
+                            }
+                        },
+                        "responses": {
+                            "201": {
+                                "description": "Material created successfully",
+                                "content": {
+                                    "application/json": {
+                                        "schema": {
+                                            "$ref": "#/components/schemas/MaterialResponse"
+                                        }
+                                    }
+                                }
+                            },
+                            "400": {
+                                "description": "Validation error",
+                                "content": {
+                                    "application/json": {
+                                        "schema": {
+                                            "$ref": "#/components/schemas/ValidationErrorResponse"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "/api/materials/{id}": {
+                    "get": {
+                        "summary": "Get material by ID",
+                        "description": "Retrieve a specific material by its ID",
+                        "parameters": [
+                            {
+                                "name": "id",
+                                "in": "path",
+                                "required": True,
+                                "description": "Material ID",
+                                "schema": {
+                                    "type": "integer"
+                                }
+                            }
+                        ],
+                        "responses": {
+                            "200": {
+                                "description": "Successful response",
+                                "content": {
+                                    "application/json": {
+                                        "schema": {
+                                            "$ref": "#/components/schemas/MaterialResponse"
+                                        }
+                                    }
+                                }
+                            },
+                            "404": {
+                                "description": "Material not found",
+                                "content": {
+                                    "application/json": {
+                                        "schema": {
+                                            "$ref": "#/components/schemas/ErrorResponse"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "put": {
+                        "summary": "Update material",
+                        "description": "Update an existing material",
+                        "parameters": [
+                            {
+                                "name": "id",
+                                "in": "path",
+                                "required": True,
+                                "description": "Material ID",
+                                "schema": {
+                                    "type": "integer"
+                                }
+                            }
+                        ],
+                        "requestBody": {
+                            "required": True,
+                            "content": {
+                                "application/json": {
+                                    "schema": {
+                                        "$ref": "#/components/schemas/MaterialUpdate"
+                                    }
+                                }
+                            }
+                        },
+                        "responses": {
+                            "200": {
+                                "description": "Material updated successfully",
+                                "content": {
+                                    "application/json": {
+                                        "schema": {
+                                            "$ref": "#/components/schemas/MaterialResponse"
+                                        }
+                                    }
+                                }
+                            },
+                            "404": {
+                                "description": "Material not found"
+                            },
+                            "400": {
+                                "description": "Validation error"
+                            }
+                        }
+                    },
+                    "delete": {
+                        "summary": "Delete material",
+                        "description": "Delete a material by ID",
+                        "parameters": [
+                            {
+                                "name": "id",
+                                "in": "path",
+                                "required": True,
+                                "description": "Material ID",
+                                "schema": {
+                                    "type": "integer"
+                                }
+                            }
+                        ],
+                        "responses": {
+                            "200": {
+                                "description": "Material deleted successfully",
+                                "content": {
+                                    "application/json": {
+                                        "schema": {
+                                            "$ref": "#/components/schemas/DeleteResponse"
+                                        }
+                                    }
+                                }
+                            },
+                            "404": {
+                                "description": "Material not found"
+                            }
+                        }
+                    }
+                }
+            },
+            "components": {
+                "securitySchemes": {
+                    "sessionAuth": {
+                        "type": "apiKey",
+                        "in": "cookie",
+                        "name": "session_id",
+                        "description": "Odoo session cookie"
+                    }
+                },
+                "schemas": {
+                    "Material": {
+                        "type": "object",
+                        "properties": {
+                            "id": {"type": "integer", "description": "Material ID"},
+                            "code": {"type": "string", "description": "Material code"},
+                            "name": {"type": "string", "description": "Material name"},
+                            "type": {
+                                "type": "string",
+                                "enum": ["fabric", "jeans", "cotton"],
+                                "description": "Material type"
+                            },
+                            "buy_price": {
+                                "type": "number",
+                                "minimum": 100,
+                                "description": "Buy price (minimum 100)"
+                            },
+                            "supplier_id": {"type": "integer", "description": "Supplier ID"},
+                            "supplier_name": {"type": "string", "description": "Supplier name"},
+                            "active": {"type": "boolean", "description": "Active status"},
+                            "create_date": {"type": "string", "format": "date-time"},
+                            "write_date": {"type": "string", "format": "date-time"}
+                        }
+                    },
+                    "MaterialCreate": {
+                        "type": "object",
+                        "required": ["code", "name", "type", "buy_price", "supplier_id"],
+                        "properties": {
+                            "code": {"type": "string", "description": "Material code"},
+                            "name": {"type": "string", "description": "Material name"},
+                            "type": {
+                                "type": "string",
+                                "enum": ["fabric", "jeans", "cotton"]
+                            },
+                            "buy_price": {
+                                "type": "number",
+                                "minimum": 100
+                            },
+                            "supplier_id": {"type": "integer"},
+                            "active": {"type": "boolean", "default": True}
+                        }
+                    },
+                    "MaterialUpdate": {
+                        "type": "object",
+                        "properties": {
+                            "code": {"type": "string"},
+                            "name": {"type": "string"},
+                            "type": {
+                                "type": "string",
+                                "enum": ["fabric", "jeans", "cotton"]
+                            },
+                            "buy_price": {
+                                "type": "number",
+                                "minimum": 100
+                            },
+                            "supplier_id": {"type": "integer"},
+                            "active": {"type": "boolean"}
+                        }
+                    },
+                    "MaterialResponse": {
+                        "type": "object",
+                        "properties": {
+                            "status": {"type": "string", "example": "success"},
+                            "message": {"type": "string"},
+                            "data": {"$ref": "#/components/schemas/Material"}
+                        }
+                    },
+                    "MaterialListResponse": {
+                        "type": "object",
+                        "properties": {
+                            "status": {"type": "string", "example": "success"},
+                            "data": {
+                                "type": "array",
+                                "items": {"$ref": "#/components/schemas/Material"}
+                            },
+                            "total_count": {"type": "integer"},
+                            "limit": {"type": "integer"},
+                            "offset": {"type": "integer"}
+                        }
+                    },
+                    "DeleteResponse": {
+                        "type": "object",
+                        "properties": {
+                            "status": {"type": "string", "example": "success"},
+                            "message": {"type": "string"},
+                            "deleted_data": {"$ref": "#/components/schemas/Material"}
+                        }
+                    },
+                    "ErrorResponse": {
+                        "type": "object",
+                        "properties": {
+                            "error": {"type": "string"},
+                            "status": {"type": "string", "example": "error"}
+                        }
+                    },
+                    "ValidationErrorResponse": {
+                        "type": "object",
+                        "properties": {
+                            "error": {"type": "string"},
+                            "details": {
+                                "type": "array",
+                                "items": {"type": "string"}
+                            },
+                            "status": {"type": "string", "example": "error"}
+                        }
+                    }
+                }
+            }
+        }
+        
+        return request.make_response(
+            json.dumps(openapi_spec, indent=2),
+            headers={'Content-Type': 'application/json'}
+        )
+    
     def _get_material_data(self, material):
         """Helper method to format material data for API response"""
         return {
