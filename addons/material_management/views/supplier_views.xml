@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Tree View -->
+        <record id="view_material_supplier_tree" model="ir.ui.view">
+            <field name="name">material.supplier.tree</field>
+            <field name="model">material.supplier</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="code"/>
+                    <field name="name"/>
+                    <field name="email"/>
+                    <field name="phone"/>
+                    <field name="material_count"/>
+                    <field name="active"/>
+                </tree>
+            </field>
+        </record>
+
+        <!-- Form View -->
+        <record id="view_material_supplier_form" model="ir.ui.view">
+            <field name="name">material.supplier.form</field>
+            <field name="model">material.supplier</field>
+            <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        <div class="oe_button_box" name="button_box">
+                            <button name="action_view_materials" type="object" class="oe_stat_button" icon="fa-cubes">
+                                <field name="material_count" widget="statinfo" string="Materials"/>
+                            </button>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="name"/>
+                                <field name="code"/>
+                                <field name="active"/>
+                            </group>
+                            <group>
+                                <field name="email" widget="email"/>
+                                <field name="phone" widget="phone"/>
+                            </group>
+                        </group>
+                        <group>
+                            <field name="address" placeholder="Enter supplier address..."/>
+                        </group>
+                        <notebook>
+                            <page string="Materials" name="materials">
+                                <field name="material_ids">
+                                    <tree>
+                                        <field name="code"/>
+                                        <field name="name"/>
+                                        <field name="type"/>
+                                        <field name="buy_price"/>
+                                        <field name="active"/>
+                                    </tree>
+                                </field>
+                            </page>
+                        </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <!-- Search View - SIMPLIFIED -->
+        <record id="view_material_supplier_search" model="ir.ui.view">
+            <field name="name">material.supplier.search</field>
+            <field name="model">material.supplier</field>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="name" string="Supplier"/>
+                    <field name="code"/>
+                    <field name="email"/>
+                    <separator/>
+                    <filter string="Active" name="active" domain="[('active', '=', True)]"/>
+                    <filter string="Inactive" name="inactive" domain="[('active', '=', False)]"/>
+                    <separator/>
+                    <!-- SIMPLIFIED: Removed the problematic filter for now -->
+                    <group expand="0" string="Group By">
+                        <filter string="Active Status" name="group_active" context="{'group_by': 'active'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <!-- Action -->
+        <record id="action_material_supplier" model="ir.actions.act_window">
+            <field name="name">Suppliers</field>
+            <field name="res_model">material.supplier</field>
+            <field name="view_mode">tree,form</field>
+            <field name="search_view_id" ref="view_material_supplier_search"/>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Create your first supplier!
+                </p>
+                <p>
+                    Suppliers provide materials for your business. Add supplier information including contact details and track which materials they supply.
+                </p>
+            </field>
+        </record>
+    </data>
+</odoo>

@@ -30,12 +30,12 @@ class MaterialManagement(models.Model):
         help='Purchase price of the material (must be >= 100)'
     )
     
+    # Update the supplier_id field definition:
     supplier_id = fields.Many2one(
-        'res.partner',
+        'material.supplier',  # Changed from 'res.partner' to 'material.supplier'
         string='Supplier',
         required=True,
-        domain=[('is_company', '=', True), ('supplier_rank', '>', 0)],
-        help='Supplier of the material'
+        help='Supplier of this material'
     )
     
     # Additional useful fields
