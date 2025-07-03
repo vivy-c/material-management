@@ -140,6 +140,10 @@ POST /api/suppliers
 Use the included testing script:
 
 ```bash
+# Copy the updated script
+docker cp test_api_manual.py $(docker-compose ps -q web):/tmp/test_api_manual.py
+
+# Run the authenticated test
 docker-compose exec web python3 /tmp/test_api_manual.py
 ```
 
@@ -149,34 +153,40 @@ This script will:
 - Perform CRUD operations on materials
 - Validate API security
 
-### Test Coverage
-- Authentication enforcement
-- Data validation
-- CRUD operations
-- Error handling
-- Relationship integrity
+#### Sample Test Output
+```
+$ docker-compose exec web python3 /tmp/test_api_manual.py
+WARN[0000] /Users/vivycahyani/Kerja/material-management/docker-compose.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion 
+🚀 Starting Odoo Authenticated API Tests
+==================================================
+✅ Authentication successful
+✅ API is accessible
 
-## 🔧 Configuration
+🏢 Testing Suppliers API...
 
-### Database Configuration
-Edit `config/odoo.conf` to modify:
-- Database connection settings
-- Security parameters
-- Performance tuning
+1. Testing GET /api/suppliers
+✅ Found 4 suppliers
 
-### Docker Configuration
-Modify `docker-compose.yml` for:
-- Port mappings
-- Volume mounts
-- Environment variables
+2. Testing POST /api/suppliers
+✅ Supplier created with ID: 24
 
-## 🚀 Development
+📦 Testing Materials API...
 
-### Adding New Features
-1. Create new models in `models/` directory
-2. Add views in `views/` directory
-3. Update `__manifest__.py` with dependencies
-4. Add security rules in `security/`
+1. Testing GET /api/materials
+✅ Found 0 materials
 
-### Custom API Endpoints
-Extend `controllers/material_api.py` or create new controller files.
+2. Testing POST /api/materials
+Debug - Material creation response: {'success': True, 'data': {'id': 22, 'code': 'TESTMAT1751552042', 'name': 'API Test Material 1751552042', 'type': 'cotton', 'buy_price': 175.0, 'supplier_id': 24, 'supplier_name': 'API Test Supplier 1751552042', 'active': True}, 'message': 'Material created successfully'}
+✅ Material created with ID: 22
+
+3. Testing PUT /api/materials
+✅ Material updated successfully
+
+4. Testing DELETE /api/materials
+✅ Material deleted successfully
+
+==================================================
+🎉 Authenticated API Tests Completed!
+```
+
+        
