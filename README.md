@@ -1,7 +1,5 @@
 # Material Management System
 
-A comprehensive Odoo-based ERP system for managing materials and suppliers, designed specifically for manufacturing and textile businesses.
-
 ## 🚀 Features
 
 ### Material Management
@@ -142,7 +140,7 @@ POST /api/suppliers
 Use the included testing script:
 
 ```bash
-python3 test_api_manual.py
+docker-compose exec web python3 /tmp/test_api_manual.py
 ```
 
 This script will:
