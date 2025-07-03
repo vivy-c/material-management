@@ -1,3 +1,4 @@
+import re  # Add this import
 from odoo import models, fields, api
 from odoo.exceptions import ValidationError
 
@@ -60,9 +61,12 @@ class Supplier(models.Model):
     
     @api.constrains('code')
     def _check_code_format(self):
-        for supplier in self:
-            if supplier.code and not supplier.code.replace(' ', '').isalnum():
-                raise ValidationError("Supplier code must contain only letters and numbers.")
+        """Validate supplier code format"""
+        for record in self:
+            if record.code:
+                # Allow letters, numbers, and underscores
+                if not re.match(r'^[A-Za-z0-9_]+$', record.code):
+                    raise ValidationError("Supplier code must contain only letters, numbers, and underscores.")
     
     @api.model
     def create(self, vals):
