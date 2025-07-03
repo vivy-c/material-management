@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Main Menu -->
+        <menuitem id="menu_material_supplier_root"
+                  name="Suppliers"
+                  sequence="20"/>
+        
+        <!-- Sub Menu for Suppliers -->
+        <menuitem id="menu_material_supplier"
+                  name="Suppliers"
+                  parent="menu_material_supplier_root"
+                  action="action_material_supplier"
+                  sequence="10"/>
+    </data>
+</odoo>

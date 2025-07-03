@@ -13,11 +13,11 @@
                   action="action_material_management"
                   sequence="10"/>
         
-        <!-- Sub Menu for Suppliers -->
-        <menuitem id="menu_material_supplier"
+        <!-- Add Suppliers menu under Material Management -->
+        <menuitem id="menu_material_supplier_under_materials"
                   name="Suppliers"
                   parent="menu_material_management_root"
-                  action="action_material_supplier"
+                  action="material_supplier.action_material_supplier"
                   sequence="20"/>
     </data>
 </odoo>

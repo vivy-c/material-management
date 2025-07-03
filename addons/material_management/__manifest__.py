@@ -15,11 +15,10 @@
     """,
     'author': 'Your Company',
     'website': 'https://www.yourcompany.com',
-    'depends': ['base', 'contacts', 'web'],
+    'depends': ['base', 'contacts', 'web', 'material_supplier'],  # Added material_supplier dependency
     'data': [
         'security/ir.model.access.csv',
         'views/material_management_views.xml',
-        'views/supplier_views.xml',  # Add this line
         'views/material_management_menu.xml',
     ],
     'installable': True,

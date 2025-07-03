@@ -1,5 +1,5 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_material_management,material.management,model_material_management,,1,1,1,1
-access_material_supplier,material.supplier,model_material_supplier,,1,1,1,1
 access_material_management_user,material.management.user,model_material_management,base.group_user,1,1,1,1
 access_material_management_manager,material.management.manager,model_material_management,base.group_system,1,1,1,1
+access_material_supplier,material.supplier,model_material_supplier,,1,1,1,1
