@@ -6,11 +6,18 @@
                   name="Material Management"
                   sequence="10"/>
         
-        <!-- Sub Menu -->
+        <!-- Sub Menu for Materials -->
         <menuitem id="menu_material_management"
                   name="Materials"
                   parent="menu_material_management_root"
                   action="action_material_management"
                   sequence="10"/>
+        
+        <!-- Sub Menu for Suppliers -->
+        <menuitem id="menu_material_supplier"
+                  name="Suppliers"
+                  parent="menu_material_management_root"
+                  action="action_material_supplier"
+                  sequence="20"/>
     </data>
 </odoo>

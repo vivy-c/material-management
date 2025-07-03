@@ -31,7 +31,8 @@
                             </group>
                             <group>
                                 <field name="buy_price"/>
-                                <field name="supplier_id"/>
+                                <!-- In the form view, update the supplier_id field -->
+                                <field name="supplier_id" options="{'no_create': False, 'no_open': False}"/>
                                 <field name="active"/>
                             </group>
                         </group>
