@@ -172,31 +172,6 @@ Modify `docker-compose.yml` for:
 - Volume mounts
 - Environment variables
 
-## 📊 Data Models
-
-### Material Management
-- **Code**: Unique material identifier (required, uppercase)
-- **Name**: Material name (required)
-- **Type**: Material category (fabric/jeans/cotton)
-- **Buy Price**: Purchase price (minimum 100.0)
-- **Supplier**: Linked supplier (many-to-one relationship)
-- **Active**: Status flag
-
-### Supplier
-- **Code**: Unique supplier identifier (required)
-- **Name**: Supplier name (required)
-- **Email**: Contact email
-- **Phone**: Contact phone
-- **Active**: Status flag
-- **Materials**: Related materials (one-to-many)
-
-## 🔒 Security
-
-- User authentication required for all API endpoints
-- Role-based access control
-- Data validation and constraints
-- SQL injection protection via ORM
-
 ## 🚀 Development
 
 ### Adding New Features
