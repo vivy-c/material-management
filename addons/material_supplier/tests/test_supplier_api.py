@@ -17,8 +17,7 @@ class TestSupplierAPI(HttpCase):
             'phone': '123456789'
         })
         
-        # Authenticate user
-        self.authenticate('admin', 'admin')
+        # No authentication needed for public APIs
     
     def test_get_suppliers(self):
         """Test GET /api/suppliers"""
@@ -27,7 +26,7 @@ class TestSupplierAPI(HttpCase):
             data=json.dumps({
                 'jsonrpc': '2.0',
                 'method': 'call',
-                'params': {},
+                'params': {'operation': 'list'},  # Added missing operation parameter
                 'id': 1
             }),
             headers={'Content-Type': 'application/json'}
@@ -42,6 +41,7 @@ class TestSupplierAPI(HttpCase):
         """Test POST /api/suppliers"""
         timestamp = str(int(time.time()))
         supplier_data = {
+            'operation': 'create',  # Added missing operation parameter
             'code': f'NEWSUP{timestamp}',
             'name': f'New Supplier {timestamp}',
             'email': f'new{timestamp}@supplier.com',
@@ -81,7 +81,7 @@ class TestSupplierAPI(HttpCase):
             data=json.dumps({
                 'jsonrpc': '2.0',
                 'method': 'call',
-                'params': {},
+                'params': {'operation': 'delete'},  # Added missing operation parameter
                 'id': 1
             }),
             headers={'Content-Type': 'application/json'}

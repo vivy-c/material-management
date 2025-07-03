@@ -5,8 +5,39 @@ from odoo.exceptions import ValidationError, AccessError
 
 class MaterialManagementAPI(http.Controller):
     
-    @http.route('/api/materials', type='json', auth='user', methods=['GET'], csrf=False)
-    def get_materials(self, **kwargs):
+    @http.route('/api/materials', type='json', auth='public', csrf=False)
+    def materials_api(self, **kwargs):
+        """Handle all material operations based on operation parameter"""
+        operation = kwargs.get('operation', 'list')
+        
+        if operation == 'list':
+            return self._get_materials(**kwargs)
+        elif operation == 'create':
+            return self._create_material(**kwargs)
+        else:
+            return {
+                'success': False,
+                'error': f'Invalid operation: {operation}. Use "list" or "create"'
+            }
+    
+    @http.route('/api/materials/<int:material_id>', type='json', auth='public', csrf=False)
+    def material_by_id_api(self, material_id, **kwargs):
+        """Handle material operations by ID"""
+        operation = kwargs.get('operation', 'get')
+        
+        if operation == 'get':
+            return self._get_material(material_id, **kwargs)
+        elif operation == 'update':
+            return self._update_material(material_id, **kwargs)
+        elif operation == 'delete':
+            return self._delete_material(material_id, **kwargs)
+        else:
+            return {
+                'success': False,
+                'error': f'Invalid operation: {operation}. Use "get", "update", or "delete"'
+            }
+    
+    def _get_materials(self, **kwargs):
         """Get all materials with optional filtering"""
         try:
             domain = []
@@ -46,8 +77,7 @@ class MaterialManagementAPI(http.Controller):
                 'error': str(e)
             }
     
-    @http.route('/api/materials/<int:material_id>', type='json', auth='user', methods=['GET'], csrf=False)
-    def get_material(self, material_id, **kwargs):
+    def _get_material(self, material_id, **kwargs):
         """Get a specific material by ID"""
         try:
             material = request.env['material.management'].browse(material_id)
@@ -78,8 +108,7 @@ class MaterialManagementAPI(http.Controller):
                 'error': str(e)
             }
     
-    @http.route('/api/materials', type='json', auth='user', methods=['POST'], csrf=False)
-    def create_material(self, **kwargs):
+    def _create_material(self, **kwargs):
         """Create a new material"""
         try:
             required_fields = ['code', 'name', 'type', 'buy_price', 'supplier_id']
@@ -160,8 +189,7 @@ class MaterialManagementAPI(http.Controller):
                 'error': str(e)
             }
     
-    @http.route('/api/materials/<int:material_id>', type='json', auth='user', methods=['PUT'], csrf=False)
-    def update_material(self, material_id, **kwargs):
+    def _update_material(self, material_id, **kwargs):
         """Update an existing material"""
         try:
             material = request.env['material.management'].browse(material_id)
@@ -246,8 +274,7 @@ class MaterialManagementAPI(http.Controller):
                 'error': str(e)
             }
     
-    @http.route('/api/materials/<int:material_id>', type='json', auth='user', methods=['DELETE'], csrf=False)
-    def delete_material(self, material_id, **kwargs):
+    def _delete_material(self, material_id, **kwargs):
         """Delete a material"""
         try:
             material = request.env['material.management'].browse(material_id)

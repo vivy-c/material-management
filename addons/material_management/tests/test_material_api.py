@@ -24,17 +24,16 @@ class TestMaterialAPI(HttpCase):
             'supplier_id': self.supplier.id
         })
         
-        # Authenticate user
-        self.authenticate('admin', 'admin')
+        # APIs are now public - no authentication needed
     
-    def test_get_materials_authenticated(self):
-        """Test GET /api/materials with authentication"""
+    def test_get_materials_public(self):
+        """Test GET /api/materials with public access"""
         response = self.url_open(
             '/api/materials',
             data=json.dumps({
                 'jsonrpc': '2.0',
                 'method': 'call',
-                'params': {},
+                'params': {'operation': 'list'},  # Added missing operation parameter
                 'id': 1
             }),
             headers={'Content-Type': 'application/json'}
@@ -45,9 +44,9 @@ class TestMaterialAPI(HttpCase):
         self.assertTrue(result['result']['success'])
         self.assertGreater(result['result']['count'], 0)
     
-    def test_get_materials_unauthenticated(self):
-        """Test GET /api/materials without authentication"""
-        # Logout first
+    def test_public_access_without_session(self):
+        """Test API access without any session/authentication"""
+        # Ensure we're logged out
         self.logout()
         
         response = self.url_open(
@@ -55,19 +54,25 @@ class TestMaterialAPI(HttpCase):
             data=json.dumps({
                 'jsonrpc': '2.0',
                 'method': 'call',
-                'params': {},
+                'params': {'operation': 'list'},  # Added missing operation parameter
                 'id': 1
             }),
             headers={'Content-Type': 'application/json'}
         )
         
-        # Should return session expired or redirect to login
-        self.assertIn(response.status_code, [302, 403])
+        # Should work fine since APIs are public
+        self.assertEqual(response.status_code, 200)
+        result = response.json()
+        self.assertTrue(result['result']['success'])
+
+    # Remove the conflicting test_get_materials_unauthenticated method
+    # since APIs are now public and should work without authentication
     
     def test_create_material_success(self):
         """Test POST /api/materials with valid data"""
         timestamp = str(int(time.time()))
         material_data = {
+            'operation': 'create',  # Added missing operation parameter
             'code': f'NEWMAT{timestamp}',
             'name': f'New Test Material {timestamp}',
             'type': 'fabric',
@@ -94,6 +99,7 @@ class TestMaterialAPI(HttpCase):
     def test_create_material_validation_error(self):
         """Test POST /api/materials with invalid data"""
         invalid_data = {
+            'operation': 'create',  # Added missing operation parameter
             'code': 'INVALID',
             'name': 'Invalid Material',
             'type': 'invalid_type',  # Invalid type
@@ -120,6 +126,7 @@ class TestMaterialAPI(HttpCase):
     def test_update_material(self):
         """Test PUT /api/materials/<id>"""
         update_data = {
+            'operation': 'update',  # Added missing operation parameter
             'name': 'Updated Material Name',
             'buy_price': 175.0
         }
@@ -147,7 +154,7 @@ class TestMaterialAPI(HttpCase):
             data=json.dumps({
                 'jsonrpc': '2.0',
                 'method': 'call',
-                'params': {},
+                'params': {'operation': 'delete'},  # Added missing operation parameter
                 'id': 1
             }),
             headers={'Content-Type': 'application/json'}

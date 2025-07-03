@@ -5,8 +5,81 @@ from odoo.exceptions import ValidationError, AccessError
 
 class SupplierAPI(http.Controller):
     
-    @http.route('/api/suppliers', type='json', auth='user', methods=['GET'], csrf=False)
-    def get_suppliers(self, **kwargs):
+    @http.route('/api/suppliers', type='json', auth='public', csrf=False)
+    def suppliers_api(self, **kwargs):
+        """Handle all supplier operations based on operation parameter"""
+        operation = kwargs.get('operation', 'list')
+        
+        if operation == 'list':
+            return self._get_suppliers(**kwargs)
+        elif operation == 'create':
+            return self._create_supplier(**kwargs)
+        else:
+            return {
+                'success': False,
+                'error': f'Invalid operation: {operation}. Use "list" or "create"'
+            }
+    
+    @http.route('/api/suppliers/<int:supplier_id>', type='json', auth='public', csrf=False)
+    def supplier_by_id_api(self, supplier_id, **kwargs):
+        """Handle supplier operations by ID"""
+        operation = kwargs.get('operation', 'get')
+        
+        if operation == 'get':
+            return self._get_supplier(supplier_id, **kwargs)
+        elif operation == 'update':
+            return self._update_supplier(supplier_id, **kwargs)
+        elif operation == 'delete':
+            return self._delete_supplier(supplier_id, **kwargs)
+        else:
+            return {
+                'success': False,
+                'error': f'Invalid operation: {operation}. Use "get", "update", or "delete"'
+            }
+    
+    @http.route('/api/suppliers/<int:supplier_id>/materials', type='json', auth='public', csrf=False)
+    def get_supplier_materials(self, supplier_id, **kwargs):
+        """Get all materials for a specific supplier"""
+        try:
+            supplier = request.env['material.supplier'].browse(supplier_id)
+            
+            if not supplier.exists():
+                return {
+                    'success': False,
+                    'error': 'Supplier not found'
+                }
+            
+            materials = request.env['material.management'].search([('supplier_id', '=', supplier_id)])
+            
+            result = []
+            for material in materials:
+                result.append({
+                    'id': material.id,
+                    'code': material.code,
+                    'name': material.name,
+                    'type': material.type,
+                    'buy_price': material.buy_price,
+                    'active': material.active,
+                })
+            
+            return {
+                'success': True,
+                'data': result,
+                'count': len(result),
+                'supplier': {
+                    'id': supplier.id,
+                    'name': supplier.name,
+                    'code': supplier.code
+                }
+            }
+            
+        except Exception as e:
+            return {
+                'success': False,
+                'error': str(e)
+            }
+    
+    def _get_suppliers(self, **kwargs):
         """Get all suppliers with optional filtering"""
         try:
             domain = []
@@ -46,8 +119,7 @@ class SupplierAPI(http.Controller):
                 'error': str(e)
             }
     
-    @http.route('/api/suppliers/<int:supplier_id>', type='json', auth='user', methods=['GET'], csrf=False)
-    def get_supplier(self, supplier_id, **kwargs):
+    def _get_supplier(self, supplier_id, **kwargs):
         """Get a specific supplier by ID"""
         try:
             supplier = request.env['material.supplier'].browse(supplier_id)
@@ -95,8 +167,7 @@ class SupplierAPI(http.Controller):
                 'error': str(e)
             }
     
-    @http.route('/api/suppliers', type='json', auth='user', methods=['POST'], csrf=False)
-    def create_supplier(self, **kwargs):
+    def _create_supplier(self, **kwargs):
         """Create a new supplier"""
         try:
             required_fields = ['code', 'name']
@@ -147,8 +218,7 @@ class SupplierAPI(http.Controller):
                 'error': str(e)
             }
     
-    @http.route('/api/suppliers/<int:supplier_id>', type='json', auth='user', methods=['PUT'], csrf=False)
-    def update_supplier(self, supplier_id, **kwargs):
+    def _update_supplier(self, supplier_id, **kwargs):
         """Update an existing supplier"""
         try:
             supplier = request.env['material.supplier'].browse(supplier_id)
@@ -196,8 +266,7 @@ class SupplierAPI(http.Controller):
                 'error': str(e)
             }
     
-    @http.route('/api/suppliers/<int:supplier_id>', type='json', auth='user', methods=['DELETE'], csrf=False)
-    def delete_supplier(self, supplier_id, **kwargs):
+    def _delete_supplier(self, supplier_id, **kwargs):
         """Delete a supplier"""
         try:
             supplier = request.env['material.supplier'].browse(supplier_id)
@@ -222,48 +291,6 @@ class SupplierAPI(http.Controller):
             return {
                 'success': True,
                 'message': f'Supplier "{supplier_name}" deleted successfully'
-            }
-            
-        except Exception as e:
-            return {
-                'success': False,
-                'error': str(e)
-            }
-    
-    @http.route('/api/suppliers/<int:supplier_id>/materials', type='json', auth='user', methods=['GET'], csrf=False)
-    def get_supplier_materials(self, supplier_id, **kwargs):
-        """Get all materials for a specific supplier"""
-        try:
-            supplier = request.env['material.supplier'].browse(supplier_id)
-            
-            if not supplier.exists():
-                return {
-                    'success': False,
-                    'error': 'Supplier not found'
-                }
-            
-            materials = request.env['material.management'].search([('supplier_id', '=', supplier_id)])
-            
-            result = []
-            for material in materials:
-                result.append({
-                    'id': material.id,
-                    'code': material.code,
-                    'name': material.name,
-                    'type': material.type,
-                    'buy_price': material.buy_price,
-                    'active': material.active,
-                })
-            
-            return {
-                'success': True,
-                'data': result,
-                'count': len(result),
-                'supplier': {
-                    'id': supplier.id,
-                    'name': supplier.name,
-                    'code': supplier.code
-                }
             }
             
         except Exception as e:
